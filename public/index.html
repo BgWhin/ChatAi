@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Assistant | By BgWhin 🥀</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+    <style>
+        :root { --accent-color: #6366f1; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background-color: #111827; color: #f3f4f6; line-height: 1.7; height: 100vh; display: flex; flex-direction: column; max-width: 1200px; margin: 0 auto; position: relative; }
+        .header { background-color: #1e1e2d; position: fixed; top: 0; width: 100%; max-width: inherit; z-index: 10; border-bottom: 1px solid #2d2d3d; }
+        .header-content { display: flex; align-items: center; padding: 0.75rem 1.25rem; gap: 1rem; }
+        .profile-container { display: flex; align-items: center; gap: 1rem; flex: 1; }
+        .clear-chat-button { background-color: #dc2626; color: white; border: none; border-radius: 9999px; padding: 0.75rem 1.25rem; cursor: pointer; font-weight: 500; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; font-size: 0.938rem; }
+        .clear-chat-button:hover { background-color: #ef4444; transform: translateY(-1px); }
+        .profile-image { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--accent-color), #818cf8); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: white; border: 2px solid #2d2d3d; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+        .profile-info { flex: 1; }
+        .profile-name { font-size: 1.2rem; font-weight: 600; color: #f9fafb; }
+        .credit { font-size: 0.75rem; color: #9ca3af; text-align: center; padding: 0.5rem; background-color: #161622; border-bottom: 1px solid #2d2d3d; }
+        .chat-container { flex: 1; overflow-y: auto; padding: 8.5rem 1rem 7rem 1rem; scroll-behavior: smooth; background-image: url('https://mfiles.alphacoders.com/101/1011643.jpeg'); background-size: cover; background-repeat: no-repeat; background-position: center center; background-attachment: fixed; }
+        .message, .welcome-message, .typing-indicator { position: relative; z-index: 2; }
+        .welcome-message { text-align: center; margin-bottom: 1.5rem; color: #9ca3af; animation: fadeIn 1s ease-out; background-color: rgba(31, 41, 55, 0.7); padding: 1.5rem; border-radius: 1rem; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .welcome-message h2 { color: #f9fafb; margin-bottom: 0.5rem; }
+        .message { display: table; max-width: 75%; padding: 1rem 1.25rem; border-radius: 1.25rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); animation: slideIn 0.3s ease-out; position: relative; word-wrap: break-word; margin: 1rem 0; }
+        .message pre { background-color: #1a1b26; border-radius: 0.5rem; padding: 1rem; margin: 0.5rem 0; overflow-x: auto; position: relative; }
+        .copy-button { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(99, 102, 241, 0.2); border: none; border-radius: 0.3rem; padding: 0.3rem 0.6rem; color: #fff; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.3rem; }
+        .copy-button:hover { background: rgba(99, 102, 241, 0.4); }
+        .message code { font-family: 'Fira Code', monospace; font-size: 0.9em; }
+        .user-message { background: rgba(79, 70, 229, 0.7); color: white; margin: 1rem 1.5rem 1rem auto; border-bottom-right-radius: 0.5rem; }
+        .assistant-message { background-color: rgba(31, 41, 55, 0.7); color: #f3f4f6; border: 1px solid rgba(45, 45, 61, 0.5); margin: 1rem auto 1rem 1.5rem; border-bottom-left-radius: 0.5rem; }
+        .typing-indicator { display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem 1.25rem; background-color: rgba(31, 41, 55, 0.7); border-radius: 1.25rem; border-bottom-left-radius: 0.5rem; margin: 1rem auto 1rem 1.5rem; min-width: 80px; max-width: 75%; animation: slideIn 0.3s ease-out; border: 1px solid rgba(45, 45, 61, 0.5); font-style: italic; color: #9ca3af; }
+        .typing-dot { width: 8px; height: 8px; background-color: var(--accent-color); border-radius: 50%; animation: typingBounce 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; } .typing-dot:nth-child(2) { animation-delay: -0.16s; } .typing-dot:nth-child(3) { animation-delay: 0s; }
+        .input-container { position: fixed; bottom: 0; width: 100%; max-width: inherit; padding: 1rem; background-color: #1e1e2d; border-top: 1px solid #2d2d3d; }
+        .input-wrapper { display: flex; gap: 0.75rem; max-width: 100%; margin: 0 auto; background-color: #161622; padding: 0.5rem; border-radius: 9999px; border: 1px solid #2d2d3d; position: relative; }
+        #prompt { flex: 1; padding: 0.75rem 1.25rem; border-radius: 9999px; border: none; background-color: transparent; color: #f3f4f6; font-size: 0.938rem; outline: none; }
+        #prompt::placeholder { color: #6b7280; }
+        button { background: linear-gradient(135deg, var(--accent-color), #818cf8); color: white; border: none; border-radius: 9999px; padding: 0.75rem 1.5rem; cursor: pointer; font-weight: 500; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.5rem; font-size: 0.938rem; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        button:disabled { background: #374151; cursor: not-allowed; transform: none; }
+        .attach-button { background: transparent; padding: 0.75rem; min-width: 46px; }
+        .attach-button.active { color: #a5b4fc; background: rgba(99, 102, 241, 0.2); }
+        #image-preview-container { position: absolute; bottom: 120%; left: 0; background: #1e1e2d; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #2d2d3d; display: none; align-items: center; gap: 0.5rem; }
+        #image-preview { max-height: 50px; border-radius: 0.25rem; }
+        #remove-image-btn { background: #ef4444; border-radius: 50%; width: 20px; height: 20px; padding: 0; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; min-width: 0; }
+        .toast { position: fixed; bottom: 6rem; left: 50%; transform: translateX(-50%); background-color: var(--accent-color); color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s ease; z-index: 1000; }
+        .toast.show { opacity: 1; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes typingBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        @media (max-width: 768px) { button span, .copy-button span { display: none; } button, .attach-button { padding: 0.75rem; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="profile-container">
+                <div class="profile-image"><i class="fas fa-robot"></i></div>
+                <div class="profile-info"><div class="profile-name">Gemini AI Assistant</div></div>
+            </div>
+            <button onclick="clearChat()" class="clear-chat-button"><i class="fas fa-trash"></i><span>Clear Chat</span></button>
+        </div>
+        <div class="credit">Powered By BgWhin</div>
+    </div>
+    <div class="chat-container" id="chat-container"></div>
+    <div class="toast" id="toast"></div>
+    <div class="input-container">
+        <div class="input-wrapper">
+            <div id="image-preview-container">
+                <img id="image-preview" src="" alt="Image preview">
+                <button id="remove-image-btn" title="Remove image"><i class="fas fa-times"></i></button>
+            </div>
+            <input type="file" id="file-input" accept="image/*" style="display: none;">
+            <button id="attach-file-btn" class="attach-button" title="Attach image">
+                <i class="fas fa-paperclip"></i>
+            </button>
+            <input type="text" id="prompt" placeholder="Type a message or attach an image..." onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); generateContent(); }"/>
+            <button onclick="generateContent()" id="submit-btn"><i class="fas fa-paper-plane"></i><span>Send</span></button>
+        </div>
+    </div>
+
+<script>
+marked.setOptions({
+    highlight: (code, lang) => hljs.getLanguage(lang) ? hljs.highlight(code, { language: lang }).value : hljs.highlightAuto(code).value,
+    breaks: true
+});
+
+let isGenerating = false;
+let chatHistory = [];
+const CHAT_HISTORY_KEY = 'geminiChatHistory';
+let attachedFileData = null;
+
+function saveChatHistory() {
+    try { localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(chatHistory)); } 
+    catch (e) { console.error("Error saving chat history:", e); }
+}
+
+function appendMessage(content, role) {
+    const chatContainer = document.getElementById('chat-container');
+    const welcomeMessage = document.getElementById('welcome-message');
+    if (welcomeMessage) welcomeMessage.remove();
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${role === 'user' ? 'user-message' : 'assistant-message'}`;
+    
+    let messageContent = '';
+    // Jika pesan dari user DAN ada gambar yang di-attach
+    if (role === 'user' && content.image) {
+        messageContent += `<img src="${content.image}" alt="User upload" style="max-width: 200px; border-radius: 0.5rem; margin-bottom: 0.5rem; display: block;" />`;
+    }
+
+    // Tampilkan teks. Untuk AI, render sebagai Markdown. Untuk user, tampilkan biasa.
+    // 'model' adalah role yang dikirim dari backend baru kita.
+    const textContent = (role === 'user') ? content.text : (content || '');
+    messageContent += (role === 'model' || role === 'assistant-message') ? marked.parse(textContent) : textContent;
+    messageDiv.innerHTML = messageContent;
+
+    // Tambahkan tombol copy hanya untuk pesan dari model/AI
+    if (role === 'model' || role === 'assistant-message') {
+        messageDiv.querySelectorAll('pre').forEach(pre => {
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-button';
+            copyButton.innerHTML = '<i class="fas fa-copy"></i><span>Copy</span>';
+            copyButton.onclick = () => navigator.clipboard.writeText(pre.querySelector('code').innerText).then(() => showToast('Copied!')).catch(() => showToast('Failed to copy!'));
+            pre.appendChild(copyButton);
+            hljs.highlightElement(pre.querySelector('code'));
+        });
+    }
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function loadChatHistory() {
+    const storedHistory = localStorage.getItem(CHAT_HISTORY_KEY);
+    const chatContainer = document.getElementById('chat-container');
+    chatContainer.innerHTML = '';
+    if (storedHistory) {
+        try {
+            chatHistory = JSON.parse(storedHistory) || [];
+            if (chatHistory.length > 0) {
+                chatHistory.forEach(message => {
+                    // Cek jika message.parts ada dan punya isi
+                    const part = message.parts?.[0];
+                    if (part && part.text) {
+                       appendMessage(part.text, message.role);
+                    }
+                });
+            } else { displayWelcomeMessage(); }
+        } catch (e) {
+            console.error("Error parsing chat history:", e);
+            chatHistory = [];
+            localStorage.removeItem(CHAT_HISTORY_KEY);
+            displayWelcomeMessage();
+        }
+    } else { displayWelcomeMessage(); }
+}
+
+function displayWelcomeMessage() { document.getElementById('chat-container').innerHTML = `<div class="welcome-message" id="welcome-message"><h2>Welcome to Gemini AI Assistant!</h2><p>Ask me anything, or attach an image to get started.</p></div>`; }
+function clearChat() { if (confirm("Are you sure?")) { chatHistory = []; localStorage.removeItem(CHAT_HISTORY_KEY); displayWelcomeMessage(); showToast('Chat cleared!'); } }
+function showToast(message) { const t = document.getElementById('toast'); t.textContent = message; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }
+function showTypingIndicator(message = '') { const c = document.getElementById('chat-container'); removeTypingIndicator(); const d = document.createElement('div'); d.className = 'typing-indicator'; d.id = 'typing-indicator'; d.innerHTML = message ? message : `<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`; c.appendChild(d); c.scrollTop = c.scrollHeight; }
+function removeTypingIndicator() { const i = document.getElementById('typing-indicator'); if (i) i.remove(); }
+
+function setupFileAttachment() {
+    const attachBtn = document.getElementById('attach-file-btn');
+    const fileInput = document.getElementById('file-input');
+    const previewContainer = document.getElementById('image-preview-container');
+    const previewImg = document.getElementById('image-preview');
+    const removeBtn = document.getElementById('remove-image-btn');
+
+    attachBtn.addEventListener('click', () => fileInput.click());
+    removeBtn.addEventListener('click', clearAttachment);
+
+    fileInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file || !file.type.startsWith('image/')) {
+            showToast('Please select an image file.');
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            attachedFileData = {
+                base64: reader.result.split(',')[1],
+                mimeType: file.type,
+                name: file.name,
+                dataUrl: reader.result
+            };
+            previewImg.src = reader.result;
+            previewContainer.style.display = 'flex';
+            attachBtn.classList.add('active');
+        };
+        reader.readAsDataURL(file);
+        fileInput.value = '';
+    });
+}
+
+function clearAttachment() {
+    attachedFileData = null;
+    document.getElementById('image-preview-container').style.display = 'none';
+    document.getElementById('attach-file-btn').classList.remove('active');
+}
+
+// ======================================================================
+// === FUNGSI UTAMA YANG DIUBAH - LEBIH SEDERHANA & KUAT ===
+// ======================================================================
+async function generateContent() {
+    if (isGenerating) return;
+    const promptInput = document.getElementById('prompt');
+    const userPrompt = promptInput.value.trim();
+    const fileToSend = attachedFileData;
+
+    if (!userPrompt && !fileToSend) {
+        showToast('Please type a message or attach an image.');
+        return;
+    }
+
+    isGenerating = true;
+    document.getElementById('submit-btn').disabled = true;
+    document.getElementById('attach-file-btn').disabled = true;
+    promptInput.disabled = true;
+
+    // Tampilkan pesan user di UI
+    appendMessage({ text: userPrompt, image: fileToSend?.dataUrl }, 'user');
+    
+    // Bangun 'parts' untuk dikirim ke backend
+    // Sesuai dengan format history yang diharapkan server
+    const userMessageForHistory = { 
+        role: 'user', 
+        parts: [{ text: userPrompt }] 
+    };
+    // Note: Gambar tidak dimasukkan ke history client-side untuk simplifikasi.
+    // Server akan mengelolanya dengan lebih baik.
+    chatHistory.push(userMessageForHistory);
+    
+    // Hapus input dan lampiran setelah dikirim
+    promptInput.value = '';
+    clearAttachment();
+    showTypingIndicator();
+
+    try {
+        // Panggil endpoint tunggal yang baru: /api/chat
+        const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                prompt: userPrompt,
+                history: chatHistory.slice(0, -1), // Kirim history *sebelum* pesan baru
+                imageData: fileToSend?.base64,
+                mimeType: fileToSend?.mimeType
+            })
+        });
+
+        removeTypingIndicator();
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Request to server failed.');
+        }
+
+        const data = await response.json();
+
+        // Tampilkan respons AI dari server
+        appendMessage(data.response, 'model');
+        
+        // Perbarui history lokal dengan history lengkap dari server
+        // Ini memastikan client & server selalu sinkron, termasuk hasil dari tool-use
+        chatHistory = data.updatedHistory;
+        
+        saveChatHistory();
+
+    } catch (error) {
+        removeTypingIndicator();
+        // Tampilkan pesan error di UI
+        const errorMessage = `**Error:** ${error.message || "Failed to connect to the server."}`;
+        appendMessage(errorMessage, 'model');
+        // Hapus pesan 'user' terakhir dari history jika pengiriman gagal
+        chatHistory.pop(); 
+    } finally {
+        isGenerating = false;
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('attach-file-btn').disabled = false;
+        promptInput.disabled = false;
+        promptInput.focus();
+        saveChatHistory(); // Selalu simpan state terakhir dari history
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('prompt').focus();
+    loadChatHistory();
+    setupFileAttachment();
+});
+</script>
+</body>
+</html>
