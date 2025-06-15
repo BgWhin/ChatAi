@@ -12,17 +12,21 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "server.js"
+      "src": "/api/chat",
+      "dest": "/server.js"
     },
-        {
+    {
       "src": "/telegram-webhook",
       "dest": "/server.js"
     },
-  
     {
       "src": "/(.*)",
-      "dest": "public/index.html"
+      "dest": "/public/$1"
     }
-  ]
+  ],
+  "functions": {
+    "server.js": {
+      "maxDuration": 60
+    }
+  }
 }
