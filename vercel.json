@@ -2,26 +2,27 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/handler.js",
+      "src": "server.js",
       "use": "@vercel/node"
     },
     {
-      "src": "public/**/*",
+      "src": "public/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/api/chat",
-      "dest": "/api/handler"
+      "src": "/api/(.*)",
+      "dest": "server.js"
     },
-    {
+        {
       "src": "/telegram-webhook",
-      "dest": "/api/handler"
+      "dest": "/server.js"
     },
+  
     {
       "src": "/(.*)",
-      "dest": "/public/$1"
+      "dest": "public/index.html"
     }
   ]
 }
