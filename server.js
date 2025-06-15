@@ -7,6 +7,7 @@ const express = require("express");
 const cors = require('cors');
 const TelegramBot = require('node-telegram-bot-api');
 const { kv } = require('@vercel/kv');
+const { injectSpeedInsights } require('@vercel/speed-insights');
 
 // Path yang benar sesuai struktur Anda
 const { weatherTool, getWeatherDataWttrIn } = require('./public/cuaca.js');
@@ -17,11 +18,12 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(cors());
 
-const geminiModel = "gemini-1.5-flash-latest";
+const geminiModel = "gemini-2.0-flash";
 const geminiApiKey = process.env.GEMINI_API_KEY;
 const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
 const vercelUrl = process.env.VERCEL_URL;
 
+injectSpeedInsights();
 // =================================================================
 // LOGIKA INTI GEMINI (Salin-tempel dari versi sebelumnya, tidak ada perubahan)
 // =================================================================
